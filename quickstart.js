@@ -107,7 +107,9 @@ function storeToken(token) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 async function getChannel(auth) {
-    var service = google.youtube('v3');
+    var service = google.youtube({
+        version:'v3',auth: auth
+    });
     /* service.channels.list({
          auth: auth,
          part: 'snippet,contentDetails,statistics',
@@ -129,12 +131,12 @@ async function getChannel(auth) {
          }
      });*/
   // fs.unlinkSync("file.mp4")
-    const file = fs.createWriteStream("file.mp4");
+    const file = await fs.createWriteStream("file.mp4");
     await http.get("https://api.telegram.org/file/bot901231463:AAHMqvWSKVPQLi7ufsJwfQRIkH3Ebnx4GMw/videos/file_0.MP4", response => {
         response.pipe(file);
     });
     const fileName = 'file.mp4';
-    const fileSize = await fs.statSync(fileName).size;
+    const fileSize = fs.statSync(fileName).size;
 
     const res = await service.videos.insert(
         {
@@ -168,6 +170,8 @@ async function getChannel(auth) {
         console.log("My errr :");
         console.log(errr);
     });
+
+
     console.log('\n\n');
     console.log(res);
     fs.unlink("file.mp4")
